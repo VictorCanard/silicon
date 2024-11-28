@@ -1,0 +1,360 @@
+field val : Int
+field next : Ref
+
+predicate List(l : Ref) {
+   (l != null) ==> acc(l.val) && acc(l.next) && List(l.next)
+}
+
+
+function values(l: Ref): Seq[Int]
+    requires List(l)
+{
+    unfolding List(l) in 
+    l == null
+        ? Seq()
+        : Seq(l.val) ++ values(l.next)
+}
+
+method add_recursive(l : Ref)
+  requires List(l)
+  ensures List(l) 
+  ensures |values(l)| == |old(values(l))| 
+  ensures forall i : Int :: (0 <= i < |values(l)|) ==> values(l)[i] == old(values(l)[i]) + 1
+   {
+  unfold List(l)
+  if(l != null){
+    l.val := l.val + 1
+    // Prove Pre(l.next)
+    add_recursive(l.next)
+    // Assume Post(l.next)
+  }
+  fold List(l)
+}
+
+/* method add_recursive(l : Ref)
+  requires precondition
+  ensures postcondition
+   {
+  if(l != null){
+    Body
+    Recursive Call
+  }else{
+    Base Case Code
+  }
+  Ghost Code
+} */
+
+
+
+predicate lseg(l : Ref, last : Ref) { // from l to end (excl.)
+   l != last ==> acc(l.next) && acc(l.val) && lseg(l.next, last)
+}
+
+
+
+/* method length(this: Ref) returns (res: Int)
+   requires this != null && lseg(this, null)
+   ensures lseg(this, null)
+   {
+      res := 0
+      var curr: Ref := this
+      unfold lseg(this, null)
+      fold lseg(this, curr)  // empty segment to establish loop invariant
+      while(curr.next != null)
+      invariant acc(curr.next) && acc(curr.val) && lseg(curr.next, null) && lseg(this, curr)
+      {
+         res := res + 1
+         var tmp: Ref; tmp := curr.next // read here, before permission is folded
+         addAtEnd(this, curr, curr.next) // extend predicate
+         curr := tmp
+         unfold lseg(curr, null)
+      }
+      addAtEnd(this, curr, null)
+         
+   } */
+
+predicate ListSeg(l : Ref, end : Ref) { // from l to end (excl.)
+   l != end ==> acc(l.next) && acc(l.val) && ListSeg(l.next, end)
+}
+
+function vals(l: Ref, end : Ref): Seq[Int]
+    requires ListSeg(l, end)
+{
+    unfolding ListSeg(l, end) in l == end
+        ? Seq()
+        : Seq(l.val) ++ vals(l.next, end)
+}
+
+/* method addAtEnd(this: Ref, n: Ref, nn: Ref)
+   requires ListSeg(this, n) &&  acc(ListSeg(nn, null), 1/2) && n != nn
+   requires acc(n.next) && acc(n.val) && n.next == nn
+   ensures ListSeg(this, nn) && acc(ListSeg(nn, null), 1/2)
+   ensures vals(this, nn) ==  old(vals(this, n)) ++  Seq(old(n.val))
+   {
+      if(this == n) {
+         fold ListSeg(nn, nn)  // empty segment
+         fold ListSeg(this, nn)
+      } else {
+         unfold ListSeg(this, n)
+         assert(unfolding acc(ListSeg(nn, null), 1/2) in nn != this)
+         addAtEnd(this.next, n, nn)
+         fold ListSeg(this, nn)
+      }
+   }
+
+method add_iterative(l : Ref)
+   requires l!= null && ListSeg(l, null)
+   ensures ListSeg(l, null)
+   ensures |vals(l, null)| == |old(vals(l, null))| 
+   ensures forall i : Int :: (0 <= i < |vals(l, null)|) ==> vals(l, null)[i] == old(vals(l, null)[i]) + 1
+   {
+      var curr: Ref := l
+      unfold ListSeg(l, null)
+      fold ListSeg(l, curr)  // empty segment to establish loop invariant
+
+      var idx : Int := 0
+
+      while(curr.next != null)
+         invariant ListSeg(l, curr)
+         invariant acc(curr.next) && acc(curr.val) && ListSeg(curr.next, null) 
+         
+         invariant forall i : Int :: (0 <= i < idx) ==> vals(l, curr)[i] == old(vals(l, null)[i]) + 1
+
+         invariant vals(curr.next, null) == old(vals(l, null))[idx + 1..]
+         invariant curr.val == old(vals(l, null)[idx])
+
+         invariant |vals(l, curr)| + |vals(curr.next, null)|+ 1 ==  |old(vals(l, null))|  
+         invariant idx == |vals(l, curr)|
+         
+
+        
+      {
+         
+         var tmp: Ref; tmp := curr.next // read here, before permission is folded
+         curr.val := curr.val + 1
+         assert(unfolding ListSeg(curr.next, null) in curr != curr.next)
+         addAtEnd(l, curr, curr.next) // extend predicate
+         curr := tmp
+         
+         unfold ListSeg(curr, null)
+
+         idx := idx + 1
+      }
+      // Deal with last value
+      curr.val := curr.val + 1
+
+      // Extend predicate one last time also for the last value
+      addAtEnd(l, curr, null)
+   
+} */
+
+/* method add_iterative_spec(l : Ref)
+   requires List(l)
+   ensures List(l)
+   ensures |values(l)| == |old(values(l))| 
+   ensures forall i : Int :: (0 <= i < |values(l)|) ==> values(l)[i] == old(values(l)[i]) + 1
+   {
+   var curr : Ref
+   curr := l
+
+   var idx : Int
+   idx := 0
+
+   loop_spec
+      pre: List(curr)
+      post: List(curr) && forall i : Int :: (idx <= i < |values(l)|) ==> values(l)[i] == old(values(l)[i]) + 1
+   while(curr.next != null)
+   {
+      unfold List(curr)
+      curr.val := curr.val + 1
+      curr := curr.next
+
+      idx := idx + 1
+   }
+}   */
+function length(l : Ref): Int
+    requires List(l)
+    {
+        unfolding List(l)
+        in l == null ? 0 : 1 + length(l.next)
+    }
+
+
+method len_recursive_(l : Ref, accu : Int) returns (len : Int)
+  requires List(l)
+  ensures List(l) 
+  //ensures |values(l)| == |old(values(l))| 
+  ensures accu + old(length(l)) == len 
+   {
+  unfold List(l)
+  if(l != null){
+    // Prove Pre(l.next)
+   
+    len := len_recursive_(l.next, accu + 1)
+
+    // Assume Post(l.next) 
+  }else{
+    len := accu
+  }
+  fold List(l)
+}
+
+
+method(){
+   while(curr_copy != null){
+        
+        curr_copy := curr_copy.next
+        accu_copy := accu_copy + 1
+   }
+}
+
+//loop_spec
+      //pre: List(curr)
+      //post: List(pre(curr)) 
+     // && accu + pre(length(pre(curr))) == len 
+
+// pre() -> old()
+method len_recursive_iterative_spec(curr : Ref, accu : Int) returns (len : Int, curr : Ref, accu : Int)
+    requires List(curr)
+    ensures List(curr)
+    ensures accu + old(length(curr)) == len
+{
+
+    label pre_loop
+    var curr_copy : Ref := curr
+    var accu_copy : Int := accu
+
+    unfold List(curr)
+    
+    if(curr_copy != null){
+        
+        curr_copy := curr_copy.next
+        accu_copy := accu_copy + 1
+
+        len := len_recursive_iterative_spec(curr_copy, accu_copy)
+    }else{
+        len := accu
+    }
+    fold List(curr)
+
+
+
+    //assert false
+}
+
+// This should be desugared into:
+method len_iterative_spec(l : Ref) returns (len : Int)
+   requires List(l)
+   ensures List(l)
+   ensures old(length(l)) == len 
+   {
+      var curr : Ref := l
+      var accu : Int := 0
+
+
+   // Precondition of while loop = pre of method. So if it verifies then this method call too.
+      len, curr, accu := len_recursive_iterative_spec(curr, accu) // give all loop targets to method 
+    // We get post of method and this should prove post of caller. The caller can use curr == l, as it didn't exhale this it only exhaled
+    // List(curr)
+
+      
+
+      
+   }
+
+
+/* while(l != null){
+   inhale Pre(l)
+
+   Body
+
+   exhale Pre(l) // This now refers to l.next
+
+   inhale Post(l)
+
+   Ghost Code // This helps to prove the postcondition below
+
+   exhale Post(old(curr)) // This refers to curr and not curr.next 
+} 
+
+while(l != null){
+   inhale Pre(l)
+
+   Body
+
+   exhale Pre(l) // This now refers to l.next
+
+   inhale Post(l)
+
+   Ghost Code // This helps to prove the postcondition below
+
+   exhale Post(old(curr)) // This refers to curr and not curr.next 
+} 
+Base Case Code
+
+Ghost Code
+
+exhale Post(l)
+
+
+
+inhale Pre(l)
+while(l != null){
+   Body
+
+   Ghost Code 
+
+} 
+Base Case Code
+
+Ghost Code
+
+exhale Post(l) */
+
+
+//invariant unfolding List(curr) in |values(l)| == |old(values(l))| // The length remains unchanged
+      //invariant forall i: Int :: (0 <= i < |values(l)|) ==> values(l)[i] == old(values(l))[i] + 1
+      //
+
+/* method length(l : Ref) returns (ret : Int)
+   requires List(l)
+   ensures List(l)
+ {
+   if (l == null) {
+      ret := 0
+   } else {
+      unfold List(l)
+      ret := length(l.next)
+      ret := ret + 1
+      fold List(l)
+   }
+} */
+
+
+
+
+/* method length_iterative(l : Ref) returns (ret : Int)
+   requires List(l)
+   ensures List(l)
+ {
+   var newl : Ref
+   ret := 0
+   newl := l
+   while (newl != null)
+     invariant List(newl)
+     invariant ListSeg(l, newl)
+     //requires List(newl)
+     //ensures List(l)
+   {
+      unfold List(newl)
+      ret := ret + 1
+      newl := newl.next
+      //fold List(newl)
+   }
+}  */
+
+// x -> y -> z
+//      ^ 
+//      newl
+// ^ 
+// l

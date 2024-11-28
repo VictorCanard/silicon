@@ -1,0 +1,42 @@
+//TODO: make pre(.) into prev(.)
+method add_iterative_spec(l : Ref) 
+   requires List(l)
+   ensures List(l)
+   ensures |values(l)| == |old(values(l))| 
+   ensures forall i : Int :: (0 <= i < |values(l)|) ==> values(l)[i] == old(values(l)[i]) + 1
+   {
+   var curr : Ref
+   curr := l
+
+   //generate list of words
+   while(curr.next != null) // write as while loop with condition and body
+      requires List(curr)
+      ensures List(pre(curr)) 
+      && |values(pre(curr))| == |pre(values(pre(curr)))| 
+      && forall i : Int :: 
+      (0 <= i < |values(pre(curr))|) ==> values(pre(curr))[i] == pre(values(pre(curr))[i]) + 1
+      // TODO: Make pres nested --> easier 
+   {
+      //Body includes ghost code 
+      unfold List(curr)
+      curr.val := curr.val + 1
+      curr := curr.next
+
+
+   }
+   ghost{ //back up through the rec chain or backcompatibility
+        fold List(pre(curr))
+   }
+   basecase{ // part of the loop.  or finally
+   //or else if(curr.next == null) to force user to write down negation of while loop. Easier then to write specs...
+        //tabulated to the right once
+        
+        // allow pre to make postcondition easier to prove in base case
+   }
+      
+   
+
+
+   //rest of the method. works on different parts of heap
+   
+} 

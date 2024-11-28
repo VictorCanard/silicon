@@ -1,0 +1,83 @@
+field val : Int
+field next : Ref
+
+predicate List(l : Ref) {
+   (l != null) ==> acc(l.val) && acc(l.next) && List(l.next)
+}
+
+/*method filter_rec(l : Ref, curr : Ref, prev : Ref, target : Ref){ // remove all occurences of target in l
+    if(curr == target){
+        if(curr == l){
+            filter_rec(l.next, l.next, target) 
+        }else{
+            filter_rec(l, curr, )
+        }
+    }
+
+}*/
+
+function values(l: Ref): Seq[Int]
+    requires List(l)
+{
+    unfolding List(l) in 
+    l == null
+        ? Seq()
+        : Seq(l.val) ++ values(l.next)
+}
+
+// Pre: List(curr)
+// Post: List(curr)
+//       
+
+
+method filter_iterative(l : Ref, target : Int){
+    var curr : Ref, prev : Ref, start : Ref
+
+    start := l
+    curr := l
+    prev := null
+
+    while(curr != null){
+        unfold List(curr)
+
+        if(curr.val == target){
+            if(curr == l){
+                start := curr.next
+                curr := l
+            }else{
+                //e := curr.next
+                prev.next := curr.next
+                curr := prev.next
+            }
+        }else{
+            prev := curr
+            curr := curr.next
+        }
+
+    }
+}
+
+method havoc_ref() returns (x: Ref)
+method havoc_int() returns (x: Int)
+
+method filter_spec(l : Ref, target : Int)
+    requires List(l)
+    ensures List(l) 
+    && forall i : Int :: 
+    (0 <= i < |values(l)|) ==> values(l)[i] != target
+    {
+
+        var curr : Ref := l
+
+        exhale List(curr)
+
+        curr := havoc_ref()
+
+        if(curr != null){
+
+        }
+
+
+        
+
+}
