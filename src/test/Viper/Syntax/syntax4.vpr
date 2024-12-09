@@ -29,6 +29,9 @@ method add_iterative_spec(l : Ref)
    while(curr.next != null)
       requires List(curr)
       ensures List(pre(curr))
+       && |values(pre(curr))| == |pre(values(pre(curr)))|
+       && forall i : Int ::
+       (0 <= i < |values(pre(curr))|) ==> values(pre(curr))[i] == pre(values(pre(curr))[i]) + 1
    {
       unfold List(curr)
       curr.val := curr.val + 1
