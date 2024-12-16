@@ -19,6 +19,7 @@ function values(l: Ref): Seq[Int]
 
 method add_iterative_spec(l : Ref)
    requires List(l)
+   //:: ExpectedOutput(typechecker.error)
    ensures List(l)
    ensures |values(l)| == |old(values(l))|
    ensures forall i : Int :: (0 <= i < |values(l)|) ==> values(l)[i] == old(values(l)[i]) + 1

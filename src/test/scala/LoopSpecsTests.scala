@@ -6,23 +6,24 @@
 
 
 import viper.silicon.Silicon
+import viper.silicon.tests.SiliconTests
 import viper.silver.reporter.NoopReporter
 
 
-class AdtPluginTestsLoopSpecs extends SiliconTests {
+class LoopSpecsTests extends SiliconTests {
 
-  override val testDirectories: Seq[String] = Seq("adt") //change
+  override val testDirectories: Seq[String] = Seq("loopspecs") //change
 
   override val silicon: Silicon = {
     val reporter = NoopReporter
-    val debugInfo = ("startedBy" -> "viper.silicon.AdtPluginTests") :: Nil
+    val debugInfo = ("startedBy" -> "viper.silicon.LoopSpecsTests") :: Nil
     new Silicon(reporter, debugInfo)
   }
 
   override def verifiers = List(silicon)
 
   override def configureVerifiersFromConfigMap(configMap: Map[String, Any]): Unit = {
-    val newConfigMap = configMap.updated("silicon:plugin", "viper.silver.plugin.standard.adt.AdtPlugin") //also change
+    val newConfigMap = configMap.updated("silicon:plugin", "viper.silver.plugin.standard.loopspecs.LoopSpecsPlugin")
     super.configureVerifiersFromConfigMap(newConfigMap)
   }
 
