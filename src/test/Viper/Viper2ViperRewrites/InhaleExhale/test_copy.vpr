@@ -1,0 +1,55 @@
+field val : Int
+field next : Ref
+//field prev : Ref
+
+
+predicate List(l : Ref) {
+   (l != null) ==> acc(l.val) && acc(l.next) && List(l.next)
+}
+
+
+function values(l: Ref): Seq[Int]
+    requires List(l)
+{
+    unfolding List(l) in
+    l == null
+        ? Seq()
+        : Seq(l.val) ++ values(l.next)
+}
+
+// Pre: List(curr)
+// Post: List(curr)
+//
+
+
+method list_copy(l : Ref) returns (c : Ref)
+    requires List(l)
+    ensures List(l)
+    ensures List(c) && values(l) == values(c) {
+
+    var x : Int, y : Ref, w : Ref, d : Ref
+    if(l == null){
+        c := null
+    }else{
+        c := new()
+        c.val := 0
+        c.next := null
+
+        c.val := l.val
+        w := c
+        y := l.next
+
+        while(y != null){
+            d := new()
+            d.val := 0
+            d.next := null
+
+            d.val := y.val
+            w.next := d
+            w := d
+            y := y.next
+        }
+
+    }
+}
+
