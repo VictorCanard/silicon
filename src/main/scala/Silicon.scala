@@ -26,7 +26,29 @@ import viper.silver.cfg.silver.SilverCfg
 import viper.silver.logger.ViperStdOutLogger
 import viper.silver.utility.{FileProgramSubmitter}
 
+
+
 import scala.util.chaining._
+
+case object BuildInfo {
+  /** The value is "Silicon". */
+  val projectName: String = "Silicon"
+  /** The value is "1.1-SNAPSHOT". */
+  val projectVersion: String = "1.1-SNAPSHOT"
+  /** The value is "2.13.13". */
+  val scalaVersion: String = "2.13.13"
+  /** The value is "1.10.1". */
+  val sbtVersion: String = "1.10.1"
+  /** The value is "c60047ac+". */
+  val gitRevision: String = "c60047ac+"
+  /** The value is "master". */
+  val gitBranch: String = "master"
+  override val toString: String = {
+    "projectName: %s, projectVersion: %s, scalaVersion: %s, sbtVersion: %s, gitRevision: %s, gitBranch: %s".format(
+      projectName, projectVersion, scalaVersion, sbtVersion, gitRevision, gitBranch
+    )
+  }
+}
 
 object Silicon {
   val name = BuildInfo.projectName
