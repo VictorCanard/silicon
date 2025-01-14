@@ -37,7 +37,6 @@ lazy val silicon = (project in file("."))
 
     // Run settings
     run / javaOptions += "-Xss128m",
-
     // Test settings
     Test / javaOptions ++= (run / javaOptions).value,
     Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-u", "target/test-reports", "-oD"),
