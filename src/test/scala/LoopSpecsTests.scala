@@ -13,8 +13,8 @@ import viper.silver.reporter.NoopReporter
 class LoopSpecsTests extends SiliconTests {
 
   val choice = 1
-  //override val testDirectories: Seq[String] = if (choice == 0) Seq("loopspecsie") else Seq("loopspecsrec") //change
-  override val testDirectories: Seq[String] = Seq("temp")
+  override val testDirectories: Seq[String] = if (choice == 0) Seq("loopspecsie") else Seq("loopspecsrec") //change
+  //override val testDirectories: Seq[String] = Seq("temp")
 
   override val silicon: Silicon = {
     val reporter = NoopReporter
