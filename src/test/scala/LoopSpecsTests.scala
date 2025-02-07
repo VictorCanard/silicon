@@ -12,7 +12,7 @@ import viper.silver.reporter.NoopReporter
 
 class LoopSpecsTests extends SiliconTests {
 
-  val choice = 1
+  val choice = 0
   override val testDirectories: Seq[String] = if (choice == 0) Seq("loopspecsie") else Seq("loopspecsrec") //change
   //override val testDirectories: Seq[String] = Seq("temp")
 
@@ -25,7 +25,10 @@ class LoopSpecsTests extends SiliconTests {
   override def verifiers = List(silicon)
 
   override def configureVerifiersFromConfigMap(configMap: Map[String, Any]): Unit = {
-    val newConfigMap = configMap.updated("silicon:plugin", "viper.silver.plugin.standard.loopspecs.LoopSpecsPlugin")
+    var newConfigMap = configMap.updated("silicon:plugin", "viper.silver.plugin.standard.loopspecs." ++ ( if (choice == 0) "LoopSpecsPlugin" else "LoopSpecsPluginRec"))
+
+    newConfigMap = newConfigMap.updated("silicon:printTranslatedProgram","true")
+      .updated("silicon:numberOfErrorsToReport", "0")
     super.configureVerifiersFromConfigMap(newConfigMap)
   }
 

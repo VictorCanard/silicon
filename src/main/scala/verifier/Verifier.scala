@@ -21,6 +21,7 @@ import viper.silver.reporter.Reporter
 
 import java.util.concurrent.atomic.AtomicInteger
 
+
 trait Verifier {
   def uniqueId: String
 
@@ -45,7 +46,7 @@ trait Verifier {
   val errorsReportedSoFar = new AtomicInteger(0);
 
   var debugHeapCounter = new AtomicInteger(0);
-
+//TODO INVESTIGATE!
   def reportFurtherErrors(): Boolean = (Verifier.config.numberOfErrorsToReport() > errorsReportedSoFar.get()
     || Verifier.config.numberOfErrorsToReport() == 0);
 
