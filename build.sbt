@@ -32,7 +32,9 @@ lazy val silicon = (project in file("."))
     libraryDependencies += "io.spray" %%  "spray-json" % "1.3.6",
     libraryDependencies += "com.microsoft.z3" % "z3" % "4.8.7" from "https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/com.microsoft.z3-4.8.7.jar",
 
-    // Only get a few compilation errors at once
+
+
+      // Only get a few compilation errors at once
     maxErrors := 5,
 
     // Run settings
