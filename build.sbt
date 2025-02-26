@@ -1,3 +1,4 @@
+import sbt.Keys.maxErrors
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v. 2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -33,6 +34,18 @@ lazy val silicon = (project in file("."))
     libraryDependencies += "com.microsoft.z3" % "z3" % "4.8.7" from "https://www.sosy-lab.org/ivy/org.sosy_lab/javasmt-solver-z3/com.microsoft.z3-4.8.7.jar",
 
 
+
+    //enablePlugins(JmhPlugin)
+
+//    val jmhVersion = "1.37" // Latest stable version
+//
+//    libraryDependencies ++= Seq(
+//      "org.openjdk.jmh" % "jmh-core" % jmhVersion,
+//      "org.openjdk.jmh" % "jmh-generator-annprocess" % jmhVersion,
+//      "org.openjdk.jmh" % "jmh-generator-annprocess" % jmhVersion % Provided
+//    )
+//
+//    scalacOptions ++= Seq("-opt:l:method") // Optimization settings
 
       // Only get a few compilation errors at once
     maxErrors := 5,

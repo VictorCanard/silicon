@@ -460,6 +460,7 @@ class SiliconRunnerInstance extends SiliconFrontend(StdIOReporter()) {
          */
     }
 
+
     sys.exit(exitCode)
   }
 }
