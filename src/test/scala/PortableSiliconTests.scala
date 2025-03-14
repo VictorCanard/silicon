@@ -80,7 +80,10 @@ class PortableSiliconTests extends SilSuite with StatisticalTestSuite {
 
   val commandLineArguments: Seq[String] = Seq(
     "--disableCatchingExceptions",
-    "--timeout", System.getProperty(timeoutPropertyName, "180") /* timeout in seconds */
+    "--timeout", System.getProperty(timeoutPropertyName, "300") /* timeout in seconds */,
+    "--plugin=viper.silver.plugin.standard.loopspecs.LoopSpecsPlugin",
+    "--numberOfErrorsToReport=0",
+    "--numberOfParallelVerifiers=1"
   ) ++ (if (System.getProperty(randomizePropertyName, "false").toBoolean) Seq("--proverRandomizeSeeds") else Seq.empty)
 
   lazy val verifier: Silicon = {
